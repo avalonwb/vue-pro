@@ -20,7 +20,7 @@ export default {}
 
   body,html {
     width: 100%;
-    width: 100%;
+    height: 100%;
 
     #app {
       width: 100%;
