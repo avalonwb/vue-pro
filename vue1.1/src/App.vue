@@ -5,19 +5,24 @@
 </template>
 
 <script>
-export default {
-
-}
+export default {}
 </script>
 
 <style lang="less">
-  body,html {
+* {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+
+  #app {
     width: 100%;
     height: 100%;
-
-    #app {
-      width: 100%;
-      height: 100%;
-    }
   }
+}
 </style>
