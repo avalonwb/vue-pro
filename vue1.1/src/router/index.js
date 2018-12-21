@@ -6,7 +6,8 @@ import Home from '@/components/Home'
 Vue.use(Router)
 
 const router = new Router({
-  routes: [{
+  routes: [
+    {
       path: '/',
       redirect: '/login'
     },
