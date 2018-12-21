@@ -8,7 +8,8 @@ import Home from 'components/Home'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  routes: [{
+  routes: [
+    {
       path: '/',
       redirect: '/login'
     },

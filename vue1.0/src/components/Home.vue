@@ -4,7 +4,7 @@
       <div class="logo"></div>
       <h1>Vue后台项目</h1>
       <div class="quit">
-        <a href="javascript:;">点这退出</a>
+        <a href="javascript:;" @click="quit">点这退出</a>
       </div>
     </el-header>
     <el-container>
@@ -15,7 +15,17 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {}
+  },
+  methods: {
+    quit() {
+      localStorage.removeItem('key')
+      this.$router.push('/login')
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>

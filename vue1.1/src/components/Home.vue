@@ -2,7 +2,7 @@
   <el-container class="home">
     <el-header>
       <div class="quit">
-        <a href="javascript:;">看这退出</a>
+        <a href="javascript:;" @click="quit">看这退出</a>
       </div>
       <div class="logo"></div>
       <h1>Vue后台项目-1.1</h1>
@@ -15,7 +15,17 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {}
+  },
+  methods: {
+    quit() {
+      localStorage.removeItem('key')
+      this.$router.push('/login')
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
