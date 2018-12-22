@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 
 import Login from 'components/Login'
 import Home from 'components/Home'
+import User from 'components/User'
 
 Vue.use(VueRouter)
 
@@ -19,7 +20,13 @@ const router = new VueRouter({
     },
     {
       path: '/home',
-      component: Home
+      component: Home,
+      children: [
+        {
+          path: '/user',
+          component: User
+        }
+      ]
     }
   ]
 })

@@ -59,16 +59,21 @@ export default {
             method: 'post',
             data: this.form
           }).then(res => {
-            console.log(res.data)
+            // console.log(res.data)
             if (res.data.meta.status === 200) {
               this.$message.success('登陆成功')
+
               let token = res.data.data.token
+
               localStorage.setItem('key', token)
+
               this.$router.push('/home')
             } else {
               this.$message({
                 type: 'error',
+
                 message: res.data.meta.msg,
+
                 duration: 1000
               })
             }
