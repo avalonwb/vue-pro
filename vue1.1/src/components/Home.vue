@@ -7,9 +7,47 @@
       <div class="logo"></div>
       <h1>Vue后台项目-1.1</h1>
     </el-header>
-    <el-container>
-      <el-aside width="200px">Aside</el-aside>
-      <el-main>Main</el-main>
+    <el-container class="main">
+      <el-aside width="200px">
+        <el-menu
+          default-active="2"
+          class="el-menu-vertical-demo"
+          background-color="#545c64"
+          text-color="#fff"
+          active-text-color="#ffd04b"
+          unique-opened
+          router
+        >
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>用户管理</span>
+            </template>
+            <el-menu-item index="/user">
+              <i class="el-icon-menu"></i>
+              <span slot="title">用户列表</span>
+            </el-menu-item>
+          </el-submenu>
+
+          <el-submenu index>
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>权限管理</span>
+            </template>
+            <el-menu-item index>
+              <i class="el-icon-menu"></i>
+              <span slot="title">角色列表</span>
+            </el-menu-item>
+            <el-menu-item index>
+              <i class="el-icon-menu"></i>
+              <span slot="title">权限列表</span>
+            </el-menu-item>
+          </el-submenu>
+        </el-menu>
+      </el-aside>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -20,10 +58,7 @@ export default {
     return {}
   },
   methods: {
-    quit() {
-      localStorage.removeItem('key')
-      this.$router.push('/login')
-    }
+    quit() {}
   }
 }
 </script>
@@ -62,6 +97,11 @@ export default {
         font-size: 20px;
         text-decoration: none;
       }
+    }
+  }
+  .main {
+    .el-menu {
+      height: 100%;
     }
   }
 }
