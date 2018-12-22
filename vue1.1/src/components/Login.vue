@@ -1,23 +1,19 @@
 <template>
-
   <div class="login">
-
     <el-form ref="form" :model="form" :rules="rules" label-width="80px" status-icon>
-      <img src="../assets/author.jpg" alt="">
+      <img src="../assets/author.jpg" alt>
       <el-form-item label="用户名" prop="username">
         <el-input v-model="form.username"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input v-model="form.password" type="password"></el-input>
+        <el-input v-model="form.password" type="password" @keyup.enter.native="login"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="comfirm">登录</el-button>
+        <el-button type="primary" @click="login">登录</el-button>
         <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>
-
   </div>
-
 </template>
 
 <script>
@@ -51,7 +47,7 @@ export default {
     reset() {
       this.$refs.form.resetFields()
     },
-    comfirm() {
+    login() {
       this.$refs.form.validate(valid => {
         if (valid) {
           axios({
