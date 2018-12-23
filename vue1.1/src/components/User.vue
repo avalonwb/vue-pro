@@ -10,6 +10,7 @@
     <el-input placeholder="请输入内容" v-model="query" class="input-with-select">
       <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
     </el-input>
+    <el-button type="success" @click="showAddDialog">添加用户</el-button>
     <!-- 用户列表 -->
     <el-table :data="userlist" style="width: 100%">
       <el-table-column prop="username" label="姓名" width="180"></el-table-column>
@@ -17,12 +18,23 @@
       <el-table-column prop="mobile" label="电话" width="180"></el-table-column>
       <el-table-column label="用户状态" width="180">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch
+            v-model="scope.row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="changeState(scope.row)"
+          ></el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-edit" plain size="mini"></el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
+            plain
+            size="mini"
+            @click="showEditDialog(scope.row)"
+          ></el-button>
           <el-button
             type="danger"
             icon="el-icon-delete"
@@ -44,11 +56,50 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
     ></el-pagination>
+    <!-- 添加模态框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogAddVisible" width="50%">
+      <el-form ref="addForm" :model="addForm" :rules="rules" label-width="80px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addForm.password"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="addForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogAddVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 编辑模态框 -->
+    <el-dialog title="编辑用户" :visible.sync="dialogEditVisible" width="50%">
+      <el-form ref="editForm" :model="editForm" :rules="rules" label-width="80px">
+        <el-form-item label="用户名">
+          <el-tag type="info">{{ editForm.username }}</el-tag>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="editForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editUser">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
   data() {
@@ -57,29 +108,65 @@ export default {
       query: '',
       currentPage: 1,
       pageSize: 4,
-      total: 0
+      total: 0,
+      dialogAddVisible: false,
+      addForm: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      },
+      rules: {
+        username: [
+          { required: true, message: '不得不写', trigger: 'change' },
+          { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'change' }
+        ],
+        password: [
+          { required: true, message: '不得不写', trigger: 'change' },
+          {
+            min: 6,
+            max: 12,
+            message: '长度在 6 到 12 个字符',
+            trigger: 'change'
+          }
+        ],
+        email: [
+          { type: 'email', message: '输入合法的邮箱', trigger: 'change' }
+        ],
+        mobile: [
+          { pattern: /1\d{10}/, message: '输入合法的手机号', trigger: 'change' }
+        ]
+      },
+      dialogEditVisible: false,
+      editForm: {
+        id: '',
+        username: '',
+        email: '',
+        mobile: ''
+      }
     }
   },
   methods: {
     getlist() {
-      axios({
+      this.axios({
         method: 'get',
-        url: 'http://localhost:8888/api/private/v1/users',
+        url: 'users',
         params: {
           query: this.query,
           pagenum: this.currentPage,
           pagesize: this.pageSize
-        },
-        headers: {
-          Authorization: localStorage.getItem('key')
         }
       }).then(res => {
-        console.log(res.data)
-        if (res.data.meta.status === 200) {
-          this.userlist = res.data.data.users
-          this.total = res.data.data.total
+        console.log(res)
+        let {
+          meta: { status, msg },
+          data: { users, total }
+        } = res
+        if (status === 200) {
+          this.userlist = users
+          this.total = total
         } else {
-          console.log(res.data.meta.msg)
+          console.log(msg)
         }
       })
     },
@@ -97,23 +184,24 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          axios({
+          return this.axios({
             method: 'delete',
-            url: `http://localhost:8888/api/private/v1/users/${id}`,
-            headers: {
-              Authorization: localStorage.getItem('key')
-            }
-          }).then(res => {
-            if (res.data.meta.status === 200) {
-              this.$message.success('删除成功')
-              if (this.userlist.length <= 1 && this.currentPage > 1) {
-                this.currentPage--
-              }
-              this.getlist()
-            } else {
-              console.log(res.data.meta.msg)
-            }
+            url: `users/${id}`
           })
+        })
+        .then(res => {
+          let {
+            meta: { status, msg }
+          } = res
+          if (status === 200) {
+            this.$message.success('删除成功')
+            if (this.userlist.length <= 1 && this.currentPage > 1) {
+              this.currentPage--
+            }
+            this.getlist()
+          } else {
+            console.log(msg)
+          }
         })
         .catch(() => {
           this.$message.info('取消删除')
@@ -122,6 +210,76 @@ export default {
     search() {
       this.currentPage = 1
       this.getlist()
+    },
+    async changeState({ id, mg_state: mgState }) {
+      let res = await this.axios({
+        method: 'put',
+        url: `users/${id}/state/${mgState}`
+      })
+      let {
+        meta: { status, msg }
+      } = res
+      if (status === 200) {
+        this.$message.success('修改成功')
+        this.getlist()
+      } else {
+        console.log(msg)
+      }
+    },
+    showAddDialog() {
+      this.dialogAddVisible = true
+    },
+    addUser() {
+      this.$refs.addForm.validate(async valid => {
+        if (!valid) return false
+        let res = await this.axios({
+          method: 'post',
+          url: 'users',
+          data: this.addForm
+        })
+        // console.log(res)
+        let {
+          meta: { status, msg }
+        } = res
+        if (status === 201) {
+          this.$message.success('创建成功')
+          this.dialogAddVisible = false
+          this.$refs.addForm.resetFields()
+          this.total++
+          this.currentPage = Math.ceil(this.total / this.pageSize)
+          this.getlist()
+        } else {
+          console.log(msg)
+        }
+      })
+    },
+    showEditDialog({ id, mobile, email, username }) {
+      this.dialogEditVisible = true
+      this.editForm.username = username
+      this.editForm.mobile = mobile
+      this.editForm.id = id
+      this.editForm.email = email
+    },
+    editUser() {
+      this.$refs.editForm.validate(async valid => {
+        if (!valid) return false
+        let res = await this.axios({
+          method: 'put',
+          url: `users/${this.editForm.id}`,
+          data: this.editForm
+        })
+        let {
+          meta: { status, msg }
+        } = res
+        if (status === 200) {
+          this.$message.success('更新成功')
+          this.dialogEditVisible = false
+          this.$refs.editForm.resetFields()
+          this.getlist()
+        } else {
+          console.log(msg)
+        }
+      })
     }
   },
   created() {

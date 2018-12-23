@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
   data() {
@@ -50,22 +50,25 @@ export default {
     login() {
       this.$refs.form.validate(valid => {
         if (valid) {
-          axios({
+          this.axios({
             method: 'post',
-            url: 'http://localhost:8888/api/private/v1/login',
+            url: 'login',
             data: this.form
           }).then(res => {
             // console.log(res.data)
-            if (res.data.meta.status === 200) {
+            let {
+              data: { token },
+              meta: { status, msg }
+            } = res
+            if (status === 200) {
               this.$message.success('登陆成功')
-              let token = res.data.data.token
               localStorage.setItem('key', token)
               this.$router.push('/home')
             } else {
               this.$message({
                 type: 'error',
                 duration: 1000,
-                message: res.data.meta.msg
+                message: msg
               })
             }
           })

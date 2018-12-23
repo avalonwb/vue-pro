@@ -58,7 +58,19 @@ export default {
     return {}
   },
   methods: {
-    quit() {}
+    quit() {
+      this.$confirm('你确定要腿粗吗?', '警告', {
+        type: 'warning'
+      })
+        .then(() => {
+          localStorage.removeItem('key')
+          this.$message.success('退出成功')
+          this.$router.push('login')
+        })
+        .catch(() => {
+          this.$message.info('取消退出')
+        })
+    }
   }
 }
 </script>
